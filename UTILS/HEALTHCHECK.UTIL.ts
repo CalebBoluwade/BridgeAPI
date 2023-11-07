@@ -2,7 +2,7 @@ import * as net from "net";
 import { Request, Response } from "express";
 import os from "os";
 import { ResponseSchema } from "../SCHEMAS/RESPONSE.SCHEMA";
-import NITRO_RESPONSE from "../HELPERS/RESPONSE.HELPER";
+import API_RESPONSE from "../HELPERS/APIRESPONSE.HELPER";
 import { ResponseMapping } from "./RESPONSE_MAPPING.UTILS";
 import { Pool, Client } from "pg";
 import { UTILS } from "./INDEX.UTILS";
@@ -27,8 +27,7 @@ const HealthCheck = async (
     client.release();
     // await DatabaseClient.end();
 
-    return NITRO_RESPONSE(Response, {
-      statusCode: ResponseMapping.SUCCESSFUL.SERVER,
+    return API_RESPONSE(Response, ResponseMapping.SUCCESSFUL.SERVER, {
       status: "OK",
       results: 0,
       data: [
@@ -52,8 +51,7 @@ const HealthCheck = async (
     });
   } catch (err: any) {
     UTILS.Logger.error(err, "HEALTH CHECH ERROR");
-    return NITRO_RESPONSE(Response, {
-      statusCode: 503,
+    return API_RESPONSE(Response, 503, {
       status: "Database Connection Unavailable",
       results: 0,
       data: JSON.stringify([

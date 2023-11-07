@@ -11,12 +11,6 @@ export const createUserSchema = object({
     password: string({
       required_error: "Name is required",
     }).min(6, "6 characters minimum"),
-    tpin: string({
-      required_error: "TPIN is required",
-    })
-      .min(6, "Min. of 6")
-      .max(6, "Max. of 6")
-      .regex(/^\d+$/, "OTP must contain only numbers"),
     phonenumber: string({
       required_error: "Phone number is required",
     })

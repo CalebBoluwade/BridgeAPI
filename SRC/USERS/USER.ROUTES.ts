@@ -6,7 +6,7 @@ import {
   PasswordResetSchema,
   UserEmailAuthSchema,
   createUserSchema,
-} from "./USER.SCHEMA";
+} from "./SCHEMA.USER";
 
 const userRouter = (Router: Router, ValidateAPIUser: any) => {
   Router.put("/:id");

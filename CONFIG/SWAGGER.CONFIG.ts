@@ -1,4 +1,4 @@
-import { createUserSchema } from "../SRC/USERS/USER.SCHEMA";
+import { createUserSchema } from "../SRC/USERS/SCHEMA.USER";
 
 const options = {
   definition: {

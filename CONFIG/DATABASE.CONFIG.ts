@@ -1,12 +1,13 @@
 import { Pool } from "pg";
+import { Env } from "./ENV.CONFIG";
 
 export const PGpool = new Pool({
-  user: process.env.POSTGRES_USER,
-  password: process.env.POSTGRES_PASS,
-  host: process.env.POSTGRES_HOST,
-  port: process.env.POSTGRES_PORT,
-  database: process.env.POSTGRES_BASE,
+  user: Env("POSTGRES_USER"),
+  password: Env("POSTGRES_PASS"),
+  host: Env("POSTGRES_HOST"),
+  port: Env("POSTGRES_PORT"),
+  database: Env("POSTGRES_BASE"),
   idleTimeoutMillis: 30000,
-  application_name: process.env.POSTGRES_APPID,
+  application_name: Env("POSTGRES_APPID"),
   query_timeout: 30000,
 });

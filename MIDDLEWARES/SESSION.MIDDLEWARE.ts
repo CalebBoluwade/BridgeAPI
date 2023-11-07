@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { get } from "lodash";
-import ip from "ip";
+// import ip from "ip";
 import { UTILS } from "../UTILS/INDEX.UTILS";
 import { JwtPayload } from "jsonwebtoken";
-import NITRO_RESPONSE from "../HELPERS/RESPONSE.HELPER";
+import API_RESPONSE from "../HELPERS/APIRESPONSE.HELPER";
 
 interface JWTResponse {
   valid: boolean;
@@ -23,11 +23,11 @@ const ValidateAPIUser =
       const user = VerifyUser(accessToken, "access");
       // console.log(Request.body)
 
-      const remoteIP = ip.address();
+      // const remoteIP = ip.address();
 
       UTILS.Logger.info(
         {
-          ip: remoteIP || Request.ip,
+          // ip: remoteIP || Request.ip,
           path: Request.baseUrl + Request.url,
           data:
             Object.keys(Request.body).length !== 0
@@ -44,20 +44,18 @@ const ValidateAPIUser =
       );
 
       if (!user.valid) {
-        return NITRO_RESPONSE(Response, {
+        return API_RESPONSE(Response, 401, {
           data: null,
           results: 0,
           status: accessToken ? "Expired / Invalid Token" : "No Token Provided",
-          statusCode: 401,
         });
       }
 
       if (
         !JSON.parse(process.env.AllowedSources!)?.includes(Request.body?.Source)
       ) {
-        return NITRO_RESPONSE(Response, {
+        return API_RESPONSE(Response, 400, {
           status: "Invalid Source",
-          statusCode: 400,
           data: null,
           results: 0,
         });
@@ -97,11 +95,10 @@ const ValidateAPIUser =
       }
     } catch (error: any) {
       UTILS.Logger.error([error], error.message);
-      return NITRO_RESPONSE(Response, {
+      return API_RESPONSE(Response, 400, {
         data: null,
         results: 0,
-        status: "Unable To Verify",
-        statusCode: 400,
+        status: "Unable To Verify"
       });
     }
 

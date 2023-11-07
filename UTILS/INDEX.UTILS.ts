@@ -4,6 +4,7 @@ import pino from "pino";
 import path from "path";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import { Env } from "../CONFIG/ENV.CONFIG";
 
 const signAccessJWT = (id: string, payload: any) => {
   return jwt.sign(
@@ -51,15 +52,8 @@ const verifyJWT = (token: string, type: "access" | "refresh") => {
 // console.log("sc", secretKey);
 // console.log("iv", iv);
 
-const secretKey = Buffer.from([
-  0x58, 0x1d, 0x31, 0xbb, 0x53, 0x2b, 0xc5, 0xa5, 0xea, 0x51, 0xce, 0xb4, 0xab,
-  0x0c, 0xf0, 0xed, 0xb7, 0xf4, 0x21, 0xec, 0xdb, 0xa7, 0xa7, 0x87, 0xfb, 0x53,
-  0xfa, 0xcb, 0x6d, 0x53, 0x55, 0xb3,
-]);
-const iv = Buffer.from([
-  0xe5, 0xec, 0x22, 0xbc, 0xb8, 0x5e, 0xbf, 0xbf, 0x16, 0xd4, 0x80, 0x74, 0x29,
-  0x7e, 0x6a, 0x3a,
-]);
+const secretKey = Buffer.from(Env("secretKey"));
+const iv = Buffer.from(Env("IV"));
 
 function customSerializer(obj: any): string {
   const level = obj.level;
@@ -74,13 +68,13 @@ const Timestamp = () => {
   return `,\t. "time":[${timestamp}]\t`;
 };
 
-const networkPath = "\\\\server\\share\\logs.log"; // Replace with your network path
+// const networkPath = "\\\\server\\share\\logs.log"; // Replace with your network path
 
 // Create a writable stream to the network path
 
-const logDirectory = "/app/logs";
+// // const logDirectory = `${__dirname}/LOGS`;
 
-fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+// fs.existsSync(logDirectory) ?? fs.mkdirSync(logDirectory);
 
 const Logger = pino(
   {
@@ -103,7 +97,7 @@ const Logger = pino(
     },
   },
   pino.destination({
-    dest: path.join(__dirname, `LOGS/NITRO.log`), // omit for stdout
+    dest: path.join(__dirname, `../LOGS/SERVER.log`), // omit for stdout
     // minLength: 2048, // Buffer before writing
     sync: true, // Asynchronous logging
     mkdir: true,
@@ -112,7 +106,7 @@ const Logger = pino(
   })
 );
 
-const logStream = fs.createWriteStream(networkPath, { flags: "a" });
+// const logStream = fs.createWriteStream(networkPath, { flags: "a" });
 
 // Logger.on('data', (log) => {})
 // console.log(secretKey, iv);

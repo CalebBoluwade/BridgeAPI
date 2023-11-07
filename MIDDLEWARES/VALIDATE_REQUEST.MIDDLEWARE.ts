@@ -1,12 +1,12 @@
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 import { Request, Response, NextFunction } from "express";
 import { AnyZodObject, ZodError, z } from "zod";
 import { ResponseSchema } from "../SCHEMAS/RESPONSE.SCHEMA";
-import NITRO_RESPONSE from "../HELPERS/RESPONSE.HELPER";
+import API_RESPONSE from "../HELPERS/APIRESPONSE.HELPER";
 import { ResponseMapping } from "../UTILS/RESPONSE_MAPPING.UTILS";
 import { UTILS } from "../UTILS/INDEX.UTILS";
 
-const ValidateNITRORequest =
+export const ValidateAPIRequest =
   (schema: AnyZodObject) =>
   (
     Request: Request,
@@ -26,13 +26,12 @@ const ValidateNITRORequest =
 
       if (e instanceof ZodError) {
         // Handle validation error
-        return NITRO_RESPONSE(Response, {
+        return API_RESPONSE(Response, ResponseMapping.INVALID_REQUEST.SERVER, {
           results: 0,
           data: process.env.NODE_ENV === "development" ? e.issues : null,
           status:
             ResponseMapping.INVALID_REQUEST.MESSAGE ??
             "Missing or Invalid parameters",
-          statusCode: ResponseMapping.INVALID_REQUEST.SERVER,
         });
       }
       // else {
@@ -40,13 +39,10 @@ const ValidateNITRORequest =
       //     res.status(500).json({ message: 'Internal Server Error' });
       // }
 
-      return NITRO_RESPONSE(Response, {
+      return API_RESPONSE(Response, ResponseMapping.INVALID_REQUEST.SERVER, {
         results: 0,
         data: null,
         status: e.errors[0].message,
-        statusCode: ResponseMapping.INVALID_REQUEST.SERVER,
       });
     }
   };
-
-export default ValidateNITRORequest;

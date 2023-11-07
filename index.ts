@@ -9,47 +9,55 @@ import express, {
 } from "express";
 import { PGpool } from "./CONFIG/DATABASE.CONFIG";
 import compression from "compression";
-import responseTime from "response-time";
+// import responseTime from "response-time";
 import cors from "cors";
 // import ip from "ip";
 import helmet from "helmet";
+import { ResponseSchema } from "./SCHEMAS/RESPONSE.SCHEMA";
+import { DatabaseMiddleware } from "./MIDDLEWARES/DATABASE.MIDDLEWARE";
+import { RedisClient } from "./CONFIG/REDIS.CONFIG";
+import API_RESPONSE from "./HELPERS/APIRESPONSE.HELPER";
+import { Env } from "./CONFIG/ENV.CONFIG";
+import { NotFoundRouteHandler } from "./MIDDLEWARES/NOT_FOUND.MIDDLEWARE";
 import ApplicationRouter, { Route } from "./ROUTES/INDEX.ROUTES";
+import SwaggerUI from "swagger-ui-express";
+import {
+  APIRouter,
+  SwaggerJSON,
+  openApiInstance,
+} from "./HELPERS/SWAGGER.HELPER";
 import { UTILS } from "./UTILS/INDEX.UTILS";
+import { ResponseMapping } from "./UTILS/RESPONSE_MAPPING.UTILS";
 
 // import rateLimit from "express-rate-limit";
 // import slowDown from "express-slow-down";
-// import { RedisClient } from "./CONFIG/REDIS.CONFIG";
-// import { createClient } from "redis";
-import { ResponseSchema } from "./SCHEMAS/RESPONSE.SCHEMA";
+ 
 
-import { DatabaseMiddleware } from "./MIDDLEWARES/DATABASE.MIDDLEWARE";
-import { RedisClient } from "./CONFIG/REDIS.CONFIG";
-import API_RESPONSE from "./HELPERS/RESPONSE.HELPER";
 
 export const BridgeAPI: Application = express();
 // Rate Limiting
 
-const rateLimiter = rateLimit({
-  windowMs: 10 * 60 * 5000,
-  max: 35,
-  handler: (
-    Request: Request,
-    Response: Response<ResponseSchema>,
-    next: NextFunction
-  ) => {
-    // next();
-    return API_RESPONSE(Response, {
-      status: "TOO MANY REQUESTS",
-      statusCode: 429,
-      results: 0,
-      data: null,
-    });
-  },
-});
+// const rateLimiter = rateLimit({
+//   windowMs: 10 * 60 * 5000,
+//   max: 35,
+//   handler: (
+//     Request: Request,
+//     Response: Response<ResponseSchema>,
+//     next: NextFunction
+//   ) => {
+//     // next();
+//     return API_RESPONSE(Response, 429, {
+//       status: "TOO MANY REQUESTS",
+//       statusCode: 429,
+//       results: 0,
+//       data: null,
+//     });
+//   },
+// });
 
 // const slow = slowDown
 
-BridgeAPI.use(rateLimiter);
+// BridgeAPI.use(rateLimiter);
 BridgeAPI.set("trust proxy", 1);
 BridgeAPI.use(express.urlencoded({ extended: true, limit: "50kb" }));
 BridgeAPI.use(express.json({ limit: "50kb" }));
@@ -59,7 +67,7 @@ BridgeAPI.use(
     threshold: 0,
   })
 );
-BridgeAPI.use(responseTime());
+// BridgeAPI.use(responseTime());
 BridgeAPI.use(DatabaseMiddleware);
 
 BridgeAPI.use(helmet());
@@ -112,6 +120,7 @@ const StartServer = async () => {
   } catch (error) {
     console.error(error);
     process.exitCode = 1;
+    process.exit()
   }
 
   // SendMessageQueue(queue, text);
@@ -170,8 +179,7 @@ export const ErrorHandler: ErrorRequestHandler = async (
     UTILS.Logger.error(e);
   }
 
-  return API_RESPONSE(Response, {
-    statusCode: 500,
+  return API_RESPONSE(Response, ResponseMapping.SERVER_ERROR.SERVER, {
     status: "There was an internal server error. Please try again.",
     results: 0,
     data: null,
@@ -182,13 +190,21 @@ export const ErrorHandler: ErrorRequestHandler = async (
 // Define error-handling middleware
 
 BridgeAPI.use("/BRIDGE/API/V1", Route);
+BridgeAPI.get("/", (req, res) => {
+  res.send("API SAYS Hello World");
+});
+BridgeAPI.use(
+  "/swagger",
+  SwaggerUI.serve,
+  SwaggerUI.setup(openApiInstance.generateJson(), {})
+);
 BridgeAPI.use(ErrorHandler);
 
 ApplicationRouter(BridgeAPI);
 
-const NITRO_SERVER = BridgeAPI.listen(process.env.APP_PORT, () => {
-  UTILS.Logger.info("NITRO SUCCESSFULLY STARTED...");
-  console.info(`WRITING APPLICATION LOGS to ${__dirname}/LOGS/NITRO.LOG`);
+const BridgeAPI_SERVER = BridgeAPI.listen(Env("APP_PORT"), () => {
+  UTILS.Logger.info("BRIDGE  SUCCESSFULLY STARTED...");
+  console.info(`WRITING APPLICATION LOGS to ${__dirname}/LOGS/SERVER.LOG`);
 });
 
 // Graceful Shutdown
@@ -198,11 +214,11 @@ const NITRO_SERVER = BridgeAPI.listen(process.env.APP_PORT, () => {
     await PGpool.end();
     console.log(PGpool.totalCount);
     // RedisClient.shutdown("SAVE");
-    UTILS.Logger.warn("NITRO IS BEEN SHUT DOWN...");
+    UTILS.Logger.warn("BRIDGE IS BEEN SHUT DOWN...");
     setTimeout(() => {
-      UTILS.Logger.info("NITRO TERMINATED...");
-      NITRO_SERVER.close(() => {
-        UTILS.Logger.info("NITRO HAS BEEN SHUT DOWN...");
+      UTILS.Logger.info("BRIDGE TERMINATED...");
+      BridgeAPI_SERVER.close(() => {
+        UTILS.Logger.info("BRIDGE HAS BEEN SHUT DOWN...");
       });
 
       process.exitCode = 1; // Terminate the application
@@ -216,14 +232,32 @@ const NITRO_SERVER = BridgeAPI.listen(process.env.APP_PORT, () => {
     await PGpool.end();
     console.log(PGpool.totalCount);
     // RedisClient.shutdown("SAVE");
-    UTILS.Logger.warn("NITRO IS BEEN SHUT DOWN...");
+    UTILS.Logger.warn("BRIDGE IS BEEN SHUT DOWN...");
     setTimeout(() => {
-      UTILS.Logger.info("NITRO TERMINATED...");
-      NITRO_SERVER.close(() => {
-        UTILS.Logger.info("NITRO HAS BEEN SHUT DOWN...");
+      UTILS.Logger.info("BRIDGE TERMINATED...");
+      BridgeAPI_SERVER.close(() => {
+        UTILS.Logger.info("BRIDGE HAS BEEN SHUT DOWN...");
       });
 
       process.exitCode = 1; // Terminate the application
     }, 5000);
   });
 });
+
+    // Handling uncaught Exception
+    process.on("uncaughtException", (err) => {
+      console.log(`Error: ${err.message}`);
+      console.log(`shutting down the server for handling uncaught exception`);
+    });
+    
+    // unhandled promise rejection
+    process.on("unhandledRejection", (err: Error) => {
+      console.log(`Shutting down the server for ${err.message}`);
+      console.log(`shutting down the server for unhandle promise rejection`);
+    
+      BridgeAPI_SERVER.close(() => {
+        process.exitCode = 1;
+      });
+    });
+
+BridgeAPI.use(NotFoundRouteHandler);
