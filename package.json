@@ -36,6 +36,7 @@
     "supertest": "^6.3.3",
     "swagger-ui-express": "^5.0.0",
     "ts-openapi": "^1.1.6",
+    "tsc": "^2.0.4",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
   },
