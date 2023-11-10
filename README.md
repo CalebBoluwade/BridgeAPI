@@ -5,6 +5,8 @@
 
 ```bash
 git clone https://github.com/CalebBoluwade/BridgeAPI.git
+
+cd BridgeAPI
 ```
 
 ### 2. Install Dependencies
@@ -29,7 +31,7 @@ npm run build:dev
 ## Note 
 ```plaintext
 
-    Swagger API Documentation http://localhost:2341/swagger
+    Swagger API Documentation {BaseUrl}/swagger
 
     Application Logs write to path: ./LOGS/SERVER.log 
 
