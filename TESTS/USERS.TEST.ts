@@ -1,10 +1,10 @@
 import { ResponseSchema } from "../SCHEMAS/RESPONSE.SCHEMA";
-import { NITRO_APP } from "../index";
+import { BridgeAPI } from "../index";
 import request from "supertest";
 
 describe("Account Creation and Management", async () => {
-  const loginResponse = await request(NITRO_APP)
-    .post("NITRO/API/V1/USER/AUTH/EMAIL")
+  const loginResponse = await request(BridgeAPI)
+    .post("BRIDGE/API/V1/USER/AUTH/EMAIL")
     .send({
       email: "gb@hsa.com",
       password: "RangeRover1234",
@@ -17,8 +17,8 @@ describe("Account Creation and Management", async () => {
   let authToken: string = loginResponse.body.accessToken;
 
   it("should create a new account", async () => {
-    const response = await request(NITRO_APP)
-      .get("/NITRO/API/V1/FT/INTER")
+    const response = await request(BridgeAPI)
+      .get("/BRIDGE/API/V1/AUTH")
       .set("Accept", "application/json")
       .set("Authorization", `Bearer ${authToken}`)
       .expect("Content-Type", /json/);

@@ -1,26 +1,24 @@
 import { Router } from "express";
 import { OpenApi, Types, textPlain } from "ts-openapi";
-import { any } from "zod";
-import {
-  // Auth_LoginController,
-  Auth_RegisterController,
-} from "./CONTROLLER.USER";
+import multer from "multer";
+const storage = multer.memoryStorage();
 import { ValidateAPIRequest } from "../../MIDDLEWARES/VALIDATE_REQUEST.MIDDLEWARE";
-import { createUserSchema, UserEmailAuthSchema } from "./SCHEMA.USER";
 
-export const AuthSwaggerDocs = (openApiInstance: OpenApi, API: Router) => {
+const upload = multer({ storage });
+export const LandlordSwaggerDocs = (openApiInstance: OpenApi, API: Router, ValidateAPIUser: any) => {
   API.post(
-    "/Auth/user",
-    ValidateAPIRequest(UserEmailAuthSchema),
-    Auth_RegisterController
+    "/landlord/outlets/create",
+    // ValidateAPIRequest(UserEmailAuthSchema),
+    () => {}
   );
+
   openApiInstance.addPath(
-    "/Auth/user",
+    "/landlord/outlets/create",
     {
       post: {
         description: "",
-        summary: "User Authentication API", // Method summary
-        operationId: "login",
+        summary: "Landlord Outlet Creation API",
+        operationId: "landlord-create",
         requestSchema: {
           body: Types.Object({
             required: true,
@@ -55,7 +53,7 @@ export const AuthSwaggerDocs = (openApiInstance: OpenApi, API: Router) => {
           401: textPlain("User not Found"),
           500: textPlain("Internal Server Error"),
         },
-        tags: ["Auth"],
+        tags: ["Landlord"],
         // "consumes": [
         //   "application/json"
         //   ],
@@ -68,63 +66,131 @@ export const AuthSwaggerDocs = (openApiInstance: OpenApi, API: Router) => {
     true
   );
 
-  API.post(
-    "/Auth/Register",
-    ValidateAPIRequest(createUserSchema),
-    Auth_RegisterController
-  );
+  //   API.post(
+  //     "/landlord/outlets/view",
+  //     ValidateAPIRequest(createUserSchema),
+  //     upload.single('file'),
+  //     User_RegisterController
+  //   );
   openApiInstance.addPath(
-    "/Auth/Register",
+    "/landlord/outlets/view",
     {
-      post: {
-        description: "",
-        summary: "User Authentication API", // Method summary
-        operationId: "Register",
+      get: {
+        description: "Retrieve Landlord's Outlets API",
+        summary: "Retrieve Landlord's Outlets API", // Method summary
+        operationId: "landlord_view",
+        // requestSchema: {
+        //   body: Types.Object({
+        //     required: true,
+        //     description: "Authentication using email and password",
+        //     properties: {
+        //       email: Types.Email({
+        //         description: "User's Email",
+        //         maxLength: 50,
+        //         required: true,
+        //       }),
+        //       password: Types.Password({
+        //         description: "User's Password",
+        //         maxLength: 25,
+        //         required: true,
+        //         minLength: 8,
+        //       }),
+        //       phoneNumber: Types.String({
+        //         description: "User's Phone Number",
+        //         maxLength: 25,
+        //         required: true,
+        //         minLength: 8,
+        //       }),
+        //       interests: Types.Array({
+        //         arrayType: Types.String(),
+        //         description: "User's Shopping Interests",
+        //         maxLength: 3,
+        //         required: true,
+        //       }),
+        //       userType: Types.String({
+        //         description: "User's Password",
+        //         maxLength: 25,
+        //         required: true,
+        //         minLength: 8,
+        //       }),
+        //     },
+        //     modelName: "Register",
+        //     default: {
+        //       email: "dad",
+        //       password: "mom",
+        //     },
+        //     example: {
+        //       email: "dad2",
+        //       password: "mom",
+        //     },
+        //   }),
+        // },
+        responses: {
+          // here we declare the response types
+          200: {
+            description: "Response Object",
+            schema: {
+              type: "object",
+              description: "",
+              properties: {
+                status: {
+                  type: "string",
+                },
+                results: {
+                  type: "number",
+                },
+                data: {
+                  type: "object",
+                  description: "",
+                  properties: {},
+                },
+              },
+              example: {
+                status: "Created",
+                results: 1,
+                data: [],
+              },
+            },
+            content: {
+              ResponseSchema: {
+                schema: {
+                  type: "object",
+                  description: "",
+                  properties: {},
+                },
+              },
+            },
+          },
+          401: textPlain("User not Found"),
+          500: textPlain("Internal Server Error"),
+        },
+        tags: ["Landlord"],
+        // "consumes": [
+        //   "application/json"
+        //   ],
+        // "produces": [
+        // "application/json"
+        // ],
+        security: [],
+      },
+    },
+    true
+  );
+
+  openApiInstance.addPath(
+    "/landlord/outlets/delete/:id",
+    {
+      delete: {
+        description: "Delete Outlets API",
+        summary: "Delete Outlets API",
+        operationId: "delete_outlet",
         requestSchema: {
-          body: Types.Object({
-            required: true,
-            description: "Authentication using email and password",
-            properties: {
-              email: Types.Email({
-                description: "User's Email",
-                maxLength: 50,
-                required: true,
-              }),
-              password: Types.Password({
-                description: "User's Password",
-                maxLength: 25,
-                required: true,
-                minLength: 8,
-              }),
-              phoneNumber: Types.String({
-                description: "User's Phone Number",
-                maxLength: 25,
-                required: true,
-                minLength: 8,
-              }),
-              interests: Types.Array({
-                arrayType: Types.String(),
-                description: "User's Shopping Interests",
-                maxLength: 3,
-                required: true,
-              }),
-              userType: Types.String({
-                description: "User's Password",
-                maxLength: 25,
-                required: true,
-                minLength: 8,
-              }),
-            },
-            modelName: "Register",
-            default: {
-              email: "dad",
-              password: "mom",
-            },
-            example: {
-              email: "dad2",
-              password: "mom",
-            },
-          }),
+          params: {
+            id: Types.String({
+              required: true,
+              description: "",
+            }),
+          },
         },
         responses: {
           // here we declare the response types
@@ -165,67 +231,7 @@ export const AuthSwaggerDocs = (openApiInstance: OpenApi, API: Router) => {
           401: textPlain("User not Found"),
           500: textPlain("Internal Server Error"),
         },
-        tags: ["Auth"],
-        // "consumes": [
-        //   "application/json"
-        //   ],
-        // "produces": [
-        // "application/json"
-        // ],
-        security: [],
-      },
-    },
-    true
-  );
-
-  openApiInstance.addPath(
-    "/Auth/Forgot",
-    {
-      patch: {
-        description: "",
-        summary: "User Authentication API", // Method summary
-        operationId: "ForgotPassword",
-        
-        responses: {
-          // here we declare the response types
-          201: {
-            description: "Response Object",
-            schema: {
-              type: "object",
-              description: "",
-              properties: {
-                status: {
-                  type: "string",
-                },
-                results: {
-                  type: "number",
-                },
-                data: {
-                  type: "object",
-                  description: "",
-                  properties: {},
-                },
-              },
-              example: {
-                status: "Created",
-                results: 1,
-                data: [],
-              },
-            },
-            content: {
-              ResponseSchema: {
-                schema: {
-                  type: "object",
-                  description: "",
-                  properties: {},
-                },
-              },
-            },
-          },
-          401: textPlain("User not Found"),
-          500: textPlain("Internal Server Error"),
-        },
-        tags: ["Auth"],
+        tags: ["Landlord"],
         // "consumes": [
         //   "application/json"
         //   ],
@@ -312,4 +318,79 @@ export const AuthSwaggerDocs = (openApiInstance: OpenApi, API: Router) => {
   //   },
   //   true
   // );
+
+  openApiInstance.addPath(
+    "/landlord/outlets/bid/:bidID/:action",
+    {
+      post: {
+        description: "Perform Landlord's Action Outlets API",
+        summary: "Perform Landlord's Action Outlets API", // Method summary
+        operationId: "landlord_action",
+        requestSchema: {
+          headers: {
+            // Authorization: "string"
+          },
+          params: {
+            bidID: Types.String({
+              required: true,
+              description: "",
+            }),
+            action: Types.StringEnum({
+              values: ["accept", "decline", "new"],
+              required: true,
+              description: "Landlord's Action on bid",
+            }),
+          },
+        },
+        responses: {
+          // here we declare the response types
+          200: {
+            description: "Response Object",
+            schema: {
+              type: "object",
+              description: "",
+              properties: {
+                status: {
+                  type: "string",
+                },
+                results: {
+                  type: "number",
+                },
+                data: {
+                  type: "object",
+                  description: "",
+                  properties: {},
+                },
+              },
+              example: {
+                status: "Created",
+                results: 1,
+                data: [],
+              },
+            },
+            content: {
+              ResponseSchema: {
+                schema: {
+                  type: "object",
+                  description: "",
+                  properties: {},
+                },
+              },
+            },
+          },
+          401: textPlain("User not Found"),
+          500: textPlain("Internal Server Error"),
+        },
+        tags: ["Landlord"],
+        // "consumes": [
+        //   "application/json"
+        //   ],
+        // "produces": [
+        // "application/json"
+        // ],
+        security: [],
+      },
+    },
+    true
+  );
 };

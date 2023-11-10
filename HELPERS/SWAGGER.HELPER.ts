@@ -8,43 +8,50 @@ import {
   Types,
   apiKeyAuth,
 } from "ts-openapi";
-import { AuthSwaggerDocs } from "../SRC/USERS/SWAGGER.USER";
-
 import { Router } from "express";
+import ValidateAPIUser from "../MIDDLEWARES/SESSION.MIDDLEWARE";
+import { UTILS } from "../UTILS/INDEX.UTILS";
+import HealthCheck from "../UTILS/HEALTHCHECK.UTIL";
+import { Env } from "../CONFIG/ENV.CONFIG";
+import { LandlordSwaggerDocs } from "../SRC/LANDLORD/LANDLORD.ROUTES";
+import { UserSwaggerDocs } from "../SRC/USERS/USER.ROUTES";
+import { TenantSwaggerDocs } from "../SRC/TENANT/TENANT.ROUTES";
 
-export const SwaggerJSON: OpenApiSchema = {
-  // definition: {
-  openapi: "3.0.3",
-  info: {
-    title: "BRIDGE API DOCS",
-    description: "BRIDGE API",
-    termsOfService: "",
-    version: "1.0.0",
-    contact: {
-      email: "calebb.jnr@gmail.com",
-    },
-    license: {
-      name: "MIT",
-      url: "",
-    },
-  },
-  paths: {},
-  servers: [
-    { url: `http://localhost:${process.env.PORT}` },
-    { url: "https://prod-api:443" },
-  ],
-};
+const BaseURL = `http://localhost:${Env("APP_PORT")}/BRIDGE/api/v1`
+
+// export const SwaggerJSON: OpenApiSchema = {
+//   // definition: {
+//   openapi: "3.0.3",
+//   info: {
+//     title: "BRIDGE API DOCS",
+//     description: "BRIDGE API",
+//     termsOfService: "",
+//     version: "1.0.0",
+//     contact: {
+//       email: "calebb.jnr@gmail.com",
+//     },
+//     license: {
+//       name: "MIT",
+//       url: "",
+//     },
+//   },
+//   paths: {},
+//   servers: [
+//     { url: BaseURL },
+//     { url: "https://prod-api:443" },
+//   ],
+// };
 
 export const openApiInstance: OpenApi = new OpenApi(
   "3.0.3",
-  "BRIDGE API DOCS",
+  "BRIDGE v1 API DOCS",
   "REST APIs",
   "calebb.jnr@gmail.com"
 );
 
 openApiInstance.setServers([
-  { url: "http://prod.api.com:443/api/v1" },
-  { url: `http://localhost:${process.env.PORT}/api/v1` },
+  { url: BaseURL },
+  // { url: "http://prodv2.api.com:443/api/v1" },
 ]);
 
 // openApiInstance.declareSecurityScheme("JWT", {
@@ -64,7 +71,67 @@ openApiInstance.addGlobalSecurityScheme("bearerSecurity");
 
 // openApiInstance.declareSecurityScheme()
 export const APIRouter = Router();
-AuthSwaggerDocs(openApiInstance, APIRouter);
+UserSwaggerDocs(openApiInstance, APIRouter, ValidateAPIUser(UTILS.verifyJWT));
+TenantSwaggerDocs(openApiInstance, APIRouter, ValidateAPIUser(UTILS.verifyJWT))
+LandlordSwaggerDocs(openApiInstance, APIRouter, ValidateAPIUser(UTILS.verifyJWT))
+
+// APIRouter.get("/health", ValidateAPIUser(UTILS.verifyJWT), HealthCheck);
+APIRouter.get("/health", HealthCheck);
+
+openApiInstance.addPath(
+  "/health",
+  {
+    get: {
+      description: "",
+      summary: "API Health Check", // Method summary
+      operationId: "health",
+      // requestSchema: {
+      //   body: Types.Object({
+      //     required: true,
+      //     description: "Authentication using email and password",
+      //     properties: {
+      //       email: Types.Email({
+      //         description: "User's Email",
+      //         maxLength: 50,
+      //         required: true,
+      //       }),
+      //       password: Types.Password({
+      //         description: "User's Password",
+      //         maxLength: 25,
+      //         required: true,
+      //         minLength: 8,
+      //       }),
+      //     },
+      //     modelName: "Login",
+      //     default: {
+      //       email: "dad",
+      //       password: "mom",
+      //     },
+      //     example: {
+      //       email: "dad2",
+      //       password: "mom",
+      //     },
+      //   }),
+      // },
+      responses: {
+        // here we declare the response types
+        200: textPlain("SUCCESSFUL"),
+        401: textPlain("Unauthorized"),
+        500: textPlain("Internal Server Error"),
+        503: textPlain("Service Unavailable"),
+      },
+      tags: ["Health Check"],
+      // "consumes": [
+      //   "application/json"
+      //   ],
+      // "produces": [
+      // "application/json"
+      // ],
+      security: [],
+    },
+  },
+  true
+);
 
 export const APIResponse = Types.Object({
   properties: {

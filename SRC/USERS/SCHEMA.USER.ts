@@ -1,4 +1,4 @@
-import { date, object, string, TypeOf } from "zod";
+import { object, string, TypeOf } from "zod";
 
 export const createUserSchema = object({
   body: object({
@@ -17,14 +17,13 @@ export const createUserSchema = object({
       .min(11, "Phone Number must have min. of 10 characters")
       .max(11, "Phone Number must have max. of 11 characters")
       .regex(/^\d+$/, "must contain only numbers"),
-    userpushid: string({}).nullish(),
-    ipaddress: string().ip({
-      version: "v4",
-    }),
-    status: string({}).nullable().optional(),
-    userid: string().uuid().optional(),
-    appverion: string({}),
-    device: string({}),
+  }),
+  file: object({
+    name: string().min(3, "Name must be at least 3 characters"),
+    description: string().max(
+      200,
+      "Description must be at most 200 characters"
+    ),
   }),
 });
 

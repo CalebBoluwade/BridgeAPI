@@ -78,7 +78,7 @@ const Timestamp = () => {
 
 const Logger = pino(
   {
-    name: "NITRO LOGGER",
+    name: "API LOGGER",
     stringify: false,
     timestamp: Timestamp,
 

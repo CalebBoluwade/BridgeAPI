@@ -1,6 +1,6 @@
 // express-promise-router
 import express, { Application } from "express";
-import userRouter from "../SRC/USERS/USER.ROUTES";
+import {UserSwaggerDocs} from "../SRC/USERS/USER.ROUTES";
 import HealthCheck from "../UTILS/HEALTHCHECK.UTIL";
 // import { initOpenApi } from "../HELPERS/OpenAPI.HELPER";
 import ValidateAPIUser from "../MIDDLEWARES/SESSION.MIDDLEWARE";
@@ -14,7 +14,7 @@ const ApplicationRouter = (Application: Application) => {
 
   Route.get("/health", ValidateAPIUser(UTILS.verifyJWT), HealthCheck);
 
-  // userRouter(Route, ValidateAPIUser(UTILS.verifyJWT));
+  // UserSwaggerDocs(Route, ValidateAPIUser(UTILS.verifyJWT));
 };
 
 export default ApplicationRouter;

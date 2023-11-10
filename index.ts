@@ -19,11 +19,11 @@ import { RedisClient } from "./CONFIG/REDIS.CONFIG";
 import API_RESPONSE from "./HELPERS/APIRESPONSE.HELPER";
 import { Env } from "./CONFIG/ENV.CONFIG";
 import { NotFoundRouteHandler } from "./MIDDLEWARES/NOT_FOUND.MIDDLEWARE";
-import ApplicationRouter, { Route } from "./ROUTES/INDEX.ROUTES";
+// import ApplicationRouter, { Route } from "./ROUTES/INDEX.ROUTES";
 import SwaggerUI from "swagger-ui-express";
 import {
   APIRouter,
-  SwaggerJSON,
+  // SwaggerJSON,
   openApiInstance,
 } from "./HELPERS/SWAGGER.HELPER";
 import { UTILS } from "./UTILS/INDEX.UTILS";
@@ -31,8 +31,6 @@ import { ResponseMapping } from "./UTILS/RESPONSE_MAPPING.UTILS";
 
 // import rateLimit from "express-rate-limit";
 // import slowDown from "express-slow-down";
- 
-
 
 export const BridgeAPI: Application = express();
 // Rate Limiting
@@ -78,8 +76,8 @@ BridgeAPI.use(
       defaultSrc: ["'self'"], // default value for all directives that are absent
       scriptSrc: ["'self'"], // helps prevent XSS attacks
       frameAncestors: ["'none'"], // helps prevent Clickjacking attacks
-      imgSrc: ["'self'", "'http://imgexample.com'"],
-      styleSrc: ["'none'"],
+      // imgSrc: ["'self'", "'http://imgexample.com'"],
+      // styleSrc: ["'self'"],
     },
   })
 );
@@ -119,8 +117,8 @@ const StartServer = async () => {
     await RedisClient.connect();
   } catch (error) {
     console.error(error);
-    process.exitCode = 1;
-    process.exit()
+    // process.exitCode = 1;
+    process.exit(1);
   }
 
   // SendMessageQueue(queue, text);
@@ -128,7 +126,7 @@ const StartServer = async () => {
   PGpool.connect((err) => {
     if (err) {
       UTILS.Logger.error(err, "Error connecting to database");
-      process.exitCode = 1;
+      process.exit(1);
     } else {
       UTILS.Logger.info("Connected to Postgres DB");
     }
@@ -189,7 +187,7 @@ export const ErrorHandler: ErrorRequestHandler = async (
 };
 // Define error-handling middleware
 
-BridgeAPI.use("/BRIDGE/API/V1", Route);
+BridgeAPI.use("/BRIDGE/API/V1", APIRouter);
 BridgeAPI.get("/", (req, res) => {
   res.send("API SAYS Hello World");
 });
@@ -200,7 +198,7 @@ BridgeAPI.use(
 );
 BridgeAPI.use(ErrorHandler);
 
-ApplicationRouter(BridgeAPI);
+// ApplicationRouter(BridgeAPI);
 
 const BridgeAPI_SERVER = BridgeAPI.listen(Env("APP_PORT"), () => {
   UTILS.Logger.info("BRIDGE  SUCCESSFULLY STARTED...");
@@ -244,20 +242,20 @@ const BridgeAPI_SERVER = BridgeAPI.listen(Env("APP_PORT"), () => {
   });
 });
 
-    // Handling uncaught Exception
-    process.on("uncaughtException", (err) => {
-      console.log(`Error: ${err.message}`);
-      console.log(`shutting down the server for handling uncaught exception`);
-    });
-    
-    // unhandled promise rejection
-    process.on("unhandledRejection", (err: Error) => {
-      console.log(`Shutting down the server for ${err.message}`);
-      console.log(`shutting down the server for unhandle promise rejection`);
-    
-      BridgeAPI_SERVER.close(() => {
-        process.exitCode = 1;
-      });
-    });
+// Handling uncaught Exception
+process.on("uncaughtException", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log(`shutting down the server for handling uncaught exception`);
+});
+
+// unhandled promise rejection
+process.on("unhandledRejection", (err: Error) => {
+  console.log(`Shutting down the server for ${err.message}`);
+  console.log(`shutting down the server for unhandle promise rejection`);
+
+  BridgeAPI_SERVER.close(() => {
+    process.exitCode = 1;
+  });
+});
 
 BridgeAPI.use(NotFoundRouteHandler);
