@@ -1,21 +1,6 @@
 version: '3.9'
 
 services:
-  bridge-api:
-    build: .
-    ports:
-      - "2341:5000"
-    env_file:
-      - .env
-    volumes:
-      - ./LOGS:/app/LOGS
-      # - ./LOGS:appLogs
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - mynetwork
-
   # PostgreSQL database
   postgres:
     image: postgres:latest
@@ -33,7 +18,21 @@ services:
       - "6379:6379"
     networks:
       - mynetwork
-
+  
+  bridge-api:
+    build: .
+    ports:
+      - "2341:5000"
+    env_file:
+      - .env
+    volumes:
+      - ./LOGS:/app/LOGS
+      # - ./LOGS:appLogs
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - mynetwork
   # nginx:
   #   build:
   #     context: ./Nginx
