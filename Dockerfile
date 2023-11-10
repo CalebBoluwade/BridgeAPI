@@ -8,4 +8,6 @@ RUN npm install
 
 COPY . .
 
+COPY entrypoint.sh /
+
 ENTRYPOINT [ "sh", "/entrypoint.sh" ]
