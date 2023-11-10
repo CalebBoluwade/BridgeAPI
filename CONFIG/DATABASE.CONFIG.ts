@@ -3,7 +3,7 @@ import { Env } from "./ENV.CONFIG";
 
 export const PGpool = new Pool({
   user: Env("POSTGRES_USER"),
-  password: Env("POSTGRES_PASS"),
+  password: Env("POSTGRES_PASSWORD"),
   host: Env("POSTGRES_HOST"),
   port: Env("POSTGRES_PORT"),
   database: Env("POSTGRES_BASE"),

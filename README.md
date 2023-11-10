@@ -27,7 +27,6 @@ sudo npm install
 npm run build:dev
 ```
 
-
 ## Note 
 ```plaintext
 
