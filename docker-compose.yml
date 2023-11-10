@@ -9,7 +9,7 @@ services:
       - .env
     volumes:
       - ./LOGS:/app/LOGS
-      - appLogs
+      # - ./LOGS:appLogs
     depends_on:
       - postgres
       - redis
