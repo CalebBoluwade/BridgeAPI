@@ -15,15 +15,16 @@ import { interfaces, controller, httpGet, httpPost, httpDelete, request, queryPa
 import { injectable, inject } from "inversify";
 import { s3 } from "../../CONFIG/AWS_S3.CONFIG";
 
-// @controller("/user")
 
+// @controller("/user")
+// @injectable()
 export class userService implements interfaces.Controller {
   protected action: string = "";
-
+  
   constructor(private DatabaseClient: Pool) {
     this.DatabaseClient = DatabaseClient;
   }
-
+  
   async CreateNewUser(Request: CreateUserRequest) {
     try {
       const {

@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
   # PostgreSQL database
@@ -33,6 +33,7 @@ services:
       - redis
     networks:
       - mynetwork
+
   # nginx:
   #   build:
   #     context: ./Nginx
