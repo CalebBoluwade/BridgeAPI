@@ -6,4 +6,4 @@ npm install ts-node tsc typescript
 
 npm i -g pm2
 
-pm2 start pm2.config.js
+pm2 start ecosystem.config.js

@@ -22,9 +22,12 @@ services:
   bridge-api:
     build: .
     ports:
-      - "2341:5000"
+      - "2341:80"
+    environment:
+      NODE_OPTIONS: "--max-old-space-size=4096"
     env_file:
       - .env
+    mem_limit: 4g
     volumes:
       - ./LOGS:/app/LOGS
       # - ./LOGS:appLogs
