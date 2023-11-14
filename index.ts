@@ -117,7 +117,7 @@ const StartServer = async () => {
     await RedisClient.connect();
   } catch (error) {
     console.error(error);
-    // process.exitCode = 1;
+    process.exitCode = 1;
     process.exit(1);
   }
 
@@ -126,6 +126,7 @@ const StartServer = async () => {
   PGpool.connect((err) => {
     if (err) {
       UTILS.Logger.error(err, "Error connecting to database");
+      process.exitCode = 1;
       process.exit(1);
     } else {
       UTILS.Logger.info("Connected to Postgres DB");

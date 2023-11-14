@@ -12,5 +12,6 @@ COPY . .
 
 COPY entrypoint.sh /
 
+ENTRYPOINT [ "sh", "entrypoint.sh" ]
+
 CMD [ "npm", "run", "build:dev" ]
-ENTRYPOINT [ "sh", "/entrypoint.sh" ]

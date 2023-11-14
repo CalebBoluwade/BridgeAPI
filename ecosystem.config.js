@@ -18,12 +18,12 @@ module.exports = {
             combine_logs: true,
             time: true,
             // log_type: 'json',
-            out_file: './logs/SERVER.log',
-            err_file: './logs/SERVER.log',
+            out_file: './LOGS/SERVER.log',
+            err_file: './LOGS/SERVER.log',
             // log: './logs/SERVER.log',
             log_rotate: true,
             log_size: '10M', // Rotate the logs when they reach 10 megabytes
-            log_file: './logs/SERVER.log',
+            log_file: './LOGS/SERVER.log',
             log_backups: 5
         },
     ]
