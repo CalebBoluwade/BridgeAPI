@@ -2,8 +2,19 @@
 
 set -e
 
-npm install ts-node tsc typescript
+# /root/profile
+set -o allexport; source .env; set +o allexport
 
-npm i -g pm2
+npm install -g pm2 ts-node typescript
 
-pm2 start ecosystem.config.js
+netstat -plant
+
+which node # which docker
+
+printenv
+
+pwd && ls
+
+# echo -e "--------------- STARTING APPLICATION --------------" | pm2 start ecosystem.config.js
+
+echo -e "--------------- STARTING APPLICATION --------------" | npm run dev

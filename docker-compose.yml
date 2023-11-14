@@ -8,17 +8,17 @@ services:
       - .env
     ports:
       - "5432:5432"
-    networks:
-      - mynetwork
+    volumes:
+      - PostgresDB:/data/postgres
 
   # Redis server
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
-    networks:
-      - mynetwork
-  
+    volumes:
+      - redis_cache:/data/redis
+
   bridge-api:
     build: .
     ports:
@@ -30,13 +30,12 @@ services:
     mem_limit: 4g
     volumes:
       - ./LOGS:/app/LOGS
+      - ./:/app
+      - /app/node_modules
       # - ./LOGS:appLogs
     depends_on:
       - postgres
       - redis
-    networks:
-      - mynetwork
-
   # nginx:
   #   build:
   #     context: ./Nginx
@@ -52,7 +51,9 @@ services:
 
 volumes:
   appLogs:
-
-networks:
-  mynetwork:
-    driver: bridge
+  redis_cache:
+  PostgresDB:
+  
+# networks:
+#   mynetwork:
+#     driver: bridge

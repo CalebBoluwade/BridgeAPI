@@ -6,6 +6,8 @@ COPY package*.json ./
 
 RUN npm install
 
+EXPOSE 2341
+
 COPY . .
 
 COPY entrypoint.sh /
